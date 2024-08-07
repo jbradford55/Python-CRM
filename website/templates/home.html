@@ -1,15 +1,21 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-
 {% if user.is_authenticated %}
 
+<form method="GET" action="{% url 'home' %}" class="d-flex mb-3">
+  <input class="form-control me-2" type="search" placeholder="Search" name="q" value="{{ request.GET.q }}">
+  <button class="btn btn-outline-success" type="submit">Search</button>
+</form>
 
-<table class="table table-striped table-hover table-bordered">
-  <thead class="table-dark">
-    <tr>
+{% if request.GET.q %}
+<a href="{% url 'home' %}" class="btn btn-secondary mb-3">Back</a>
+{% endif %}
+
+<table class="table table-striped table-hover table-bordered" >
+  <thead>
+    
+    <tr class="table-orange-header">
       <th scope="col">Name</th>
       <th scope="col">Email</th>
       <th scope="col">Phone</th>
@@ -17,60 +23,233 @@
       <th scope="col">City</th>
       <th scope="col">State</th>
       <th scope="col">Zipcode</th>
-      <th scope="col">Created At</th>
+      <th scope="col">Lead Source</th>
+      <th scope="col">Project Status</th>
+      <th scope="col">Installation Date</th>
       <th scope="col">ID</th>
     </tr>
   </thead>
   <tbody>
+    {% if records %}
+      {% for record in records %}
+        <tr>
+          <td>{{ record.first_name }} {{ record.last_name }}</td>
+          <td>{{ record.email }}</td>
+          <td>{{ record.phone }}</td>
+          <td>{{ record.address }}</td>
+          <td>{{ record.city }}</td>
+          <td>{{ record.state }}</td>
+          <td>{{ record.zipcode }}</td>
+          <td>{{ record.lead_source }}</td>
+          <td>{{ record.project_status }}</td>
+          <td>{{ record.installation_date|date:"M. d, Y" }}</td>
+          <td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
+        </tr>
+      {% endfor %}
+    {% endif %}
+  </tbody>
+</table>
+
+<br/>
+<br/>
+
+<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+  <div class="carousel-inner">
+    <div class="carousel-item active">
+      <div class="d-block w-100 text-center p-4 bg-light border border-primary rounded">
+        <h3 class="text-primary">Sales Made 🏷️</h3>
+        <h5>{{ sales_made }} sales made this month {{ month }}</h5>
+        <h6>Goal: 30</h6>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="d-block w-100 text-center p-4 bg-light border border-success rounded">
+        <h3 class="text-success">Amount Sold ☀️</h3>
+        <h5>{{ kw_sold }} kW</h5>
+        <h6>Goal: 270kW</h6>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="d-block w-100 text-center p-4 bg-light border border-warning rounded">
+        <h3 class="text-warning">Revenue Generated This Month 💰</h3>
+        <h5>${{ revenue_generated }}</h5>
+        <h6>Goal: $100,000</h4>
+      </div>
+    </div>
+    <div class="carousel-item">
+      <div class="d-block w-100 text-center p-4 bg-light border border-info rounded">
+        <h3 class="text-info">Top Sales Rep 🎉</h3>
+        {% if top_sales_rep %}
+          <h5>{{ top_sales_rep.sales_representative }} - {{ top_sales_rep.total_sales }} closes</h5>
+          <h6>Congrats {{ top_sales_rep.sales_representative }}, keep it up! </h6>
+        {% else %}
+          <p>No sales this month</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+
+  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    <span class="visually-hidden bg-dark">Previous</span>
+  </button>
+  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    <span class="visually-hidden bg-dark">Next</span>
+  </button>
+</div>
+
+<br/>
+<br/>
+
+<div class="row">
+  <!-- Calendar Section -->
+  <div class="col-md-6">
+      <div id="calendar"></div>
+  </div>
+  <!-- Right Section -->
+  <!-- Start of the new section added -->
+  <div class="col-md-6">
+      <!-- Tasks for the Day -->
+      <div class="card mb-4">
+        <div class="card-body">
+          <h5 class="card-title">Tasks for Today</h5>
+          <ul class="list-group">
+            {% for task in tasks %}
+              {% if task.date == today %}
+                <li class="list-group-item">
+                  <strong>{{ task.title }}</strong><br/>
+                  {{ task.description }}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      <!-- Upcoming Installation Dates -->
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">Upcoming Installation Dates</h5>
+          <ul class="list-group">
+            {% for record in records %}
+              {% if record.installation_date >= today %}
+                <li class="list-group-item">
+                  <strong>{{ record.first_name }} {{ record.last_name }}</strong><br/>
+                  {{ record.installation_date|date:"M. d, Y" }}<br/>
+                  {{ record.address }}, {{ record.city }}
+                </li>
+              {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+  </div>
+  <!-- End of the new section added -->
+</div>
+
+
+
+
+<!-- Add Task Button -->
+<a href="{% url 'add_task' %}" class="btn btn-primary mt-4">Add Task</a>
+<!-- Delete Task Button -->
+<button class="btn btn-danger mt-4" data-bs-toggle="modal" data-bs-target="#deleteTaskModal">Delete Task</button>
+
+<!-- Delete Task Modal -->
+<div class="modal fade" id="deleteTaskModal" tabindex="-1" aria-labelledby="deleteTaskModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteTaskModalLabel">Delete Task</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="deleteTaskForm">
+          <div class="mb-3">
+            <label for="taskSelect" class="form-label">Select Task to Delete</label>
+            <select class="form-select" id="taskSelect" required>
+              {% for task in tasks %}
+              <option value="{{ task.id }}">{{ task.title }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-danger" onclick="submitDeleteTaskForm()">Delete Task</button>
+        <br/>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM fully loaded and parsed');
+    var calendarEl = document.getElementById('calendar');
     
-{% if records %}
-	{% for record in records %}
-		<tr>
-			<td>{{ record.first_name }} {{ record.last_name }}</td>
-			<td>{{ record.email }}</td>
-			<td>{{ record.phone }}</td>
-			<td>{{ record.address }}</td>
-			<td>{{ record.city }}</td>
-			<td>{{ record.state }}</td>
-			<td>{{ record.zipcode }}</td>
-			<td>{{ record.created_at }}</td>
-			<td><a href="{% url 'record' record.id %}">{{ record.id }}</a></td>
-		</tr>
-	{% endfor %}
+    if (calendarEl) {
+      console.log('Calendar element found');
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        events: [
+          {% for task in tasks %}
+          {
+            title: '{{ task.title|escapejs }}',
+            start: '{{ task.date|date:"Y-m-d" }}',
+            description: '{{ task.description|escapejs }}' // Include description here
+          },
+          {% endfor %}
+        ],
+        eventClick: function(info) {
+          // Display the event details
+          alert('Task: ' + info.event.title + '\nDescription: ' + info.event.extendedProps.description);
+        }
+      });
 
-{% endif %}
+      calendar.render();
+    } else {
+      console.log('Calendar element not found');
+    }
+  });
 
-	
-	  </tbody>
-	</table>
-
-
-
+  function submitDeleteTaskForm() {
+    var taskId = document.getElementById('taskSelect').value;
+    if (taskId) {
+      fetch(`/delete_task/${taskId}/`, {
+        method: 'DELETE',
+        headers: {
+          'X-CSRFToken': '{{ csrf_token }}'
+        }
+      }).then(response => {
+        if (response.ok) {
+          location.reload();
+        } else {
+          alert('Could not delete task.');
+        }
+      });
+    }
+  }
+</script>
 
 
 {% else %}
-
 <div class="col-md-6 offset-md-3">
-<h1>Login</h1>
-<br/>
-
-<form method="POST" action="{% url 'home' %}">
-	{% csrf_token %}
-
-  <div class="mb-3">
-    <input type="text" class="form-control" name="username", placeholder="Username" required>
-    
-  </div><br/>
-  <div class="mb-3">
-    <input type="password" class="form-control" name="password", placeholder="Password" required>
-  </div>
+  <h1>Login</h1>
   <br/>
-  <button type="submit" class="btn btn-secondary">Login</button>
-
-</form>
-
-
-
+  <form method="POST" action="{% url 'home' %}">
+    {% csrf_token %}
+    <div class="mb-3">
+      <input type="text" class="form-control" name="username" placeholder="Username" required>
+    </div><br/>
+    <div class="mb-3">
+      <input type="password" class="form-control" name="password" placeholder="Password" required>
+    </div>
+    <br/>
+    <button type="submit" class="btn btn-secondary">Login</button>
+  </form>
+</div>
 {% endif %}
-
 {% endblock %}

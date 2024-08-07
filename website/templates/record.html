@@ -1,54 +1,84 @@
 {% extends 'base.html' %}
 {% block content %}
-
-
-
 <div class="card">
   <div class="card-header"><strong>
-    	{{ customer_record.first_name }} 
-		{{ customer_record.last_name }}</strong>
+      {{ customer_record.first_name }} 
+      {{ customer_record.last_name }}</strong>
   </div>
   <div class="card-body">
-
-
-
-<p class="card-text">
-<strong>Email: </strong>{{ customer_record.email }}</p>
-
-<p class="card-text">
-<strong>Phone: </strong>{{ customer_record.phone }}
-</p>
-
-<p class="card-text">
-<strong>Address: </strong>{{ customer_record.address }}</p>
-
-<p class="card-text">
-<strong>City: </strong>{{ customer_record.city }}</p>
-
-<p class="card-text">
-<strong>State: </strong>{{ customer_record.state }}</p>
-
-<p class="card-text">
-<strong>Zipcode: </strong>{{ customer_record.zipcode }}</p>
-
-<p class="card-text">
-<strong>Create At: </strong>{{ customer_record.created_at }}</p>
-
-<p class="card-text">
-<strong>ID: </strong>{{ customer_record.id }}</p>
-    
-    
+    <p class="card-text">
+      <strong>Email: </strong>{{ customer_record.email }}</p>
+    <p class="card-text">
+      <strong>Phone: </strong>{{ customer_record.phone }}
+    </p>
+    <p class="card-text">
+      <strong>Address: </strong>{{ customer_record.address }}</p>
+    <p class="card-text">
+      <strong>City: </strong>{{ customer_record.city }}</p>
+    <p class="card-text">
+      <strong>State: </strong>{{ customer_record.state }}</p>
+    <p class="card-text">
+      <strong>Zipcode: </strong>{{ customer_record.zipcode }}</p>
+    <p class="card-text">
+      <strong>Lead Source: </strong>{{ customer_record.lead_source }}</p>
+    <p class="card-text">
+      <strong>Project Status: </strong>{{ customer_record.project_status }}</p>
+    <p class="card-text">
+      <strong>Installation Date: </strong>{{ customer_record.installation_date }}</p>
+    <p class="card-text">
+      <strong>System Size (kW): </strong>{{ customer_record.system_size }}</p>
+    <p class="card-text">
+      <strong>Estimated Cost: </strong>{{ customer_record.estimated_cost }}</p>
+    <p class="card-text">
+      <strong>Sales Representative: </strong>{{ customer_record.sales_representative }}</p>
+    <p class="card-text">
+      <strong>Notes: </strong>{{ customer_record.notes }}</p>
+    <p class="card-text">
+      <strong>Incentives: </strong>{{ customer_record.incentives }}</p>
+    <p class="card-text">
+      <strong>Created At: </strong>{{ customer_record.created_at }}</p>
+    <p class="card-text">
+      <strong>ID: </strong>{{ customer_record.id }}</p>
+    <p class="card-text">
+      <strong>Contract: </strong>
+      {% if customer_record.contract %}
+        <a href="{{ customer_record.contract.url }}" target="_blank">View Contract</a>
+      {% else %}
+        No contract uploaded
+      {% endif %}
+    </p>
   </div>
 </div>
-
-<br/><br/>
+<br/>
 <a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
-
 <a href="{% url 'delete_record' customer_record.id %}" class="btn btn-danger">Delete</a>
-
 <a href="{% url 'update_record' customer_record.id %}" class="btn btn-secondary">Update record</a>
+<a href="{% url 'email_customer_info' customer_record.id %}" class="btn btn-primary">Email Information</a>
+<br/><br/>
 
+<h3 class="text-center">Interactions</h3>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Notes</th>
+            <th>Outcome</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for interaction in interactions %}
+        <tr>
+            <td>{{ interaction.get_interaction_type_display }}</td>
+            <td>{{ interaction.date }}</td>
+            <td>{{ interaction.notes }}</td>
+            <td>{{ interaction.outcome }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-		
+<a href="{% url 'add_interaction' customer_record.id %}" class="btn btn-primary">Add Interaction</a>
+<br/><br/>
 
 {% endblock %}
