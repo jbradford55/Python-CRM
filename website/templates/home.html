@@ -53,55 +53,46 @@
 <br/>
 <br/>
 
-<div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <div class="d-block w-100 text-center p-4 bg-light border border-primary rounded">
-        <h3 class="text-primary">Sales Made 🏷️</h3>
-        <h5>{{ sales_made }} sales made this month {{ month }}</h5>
-        <h6>Goal: 30</h6>
+<div class="row text-center">
+  <div class="col-md-3">
+      <div class="p-4 bg-light border border-primary rounded">
+          <h3 class="text-primary">Sales Made 🏷️</h3>
+          <h5>{{ sales_made }} sales made this month {{ month }}</h5>
+          <h6>Goal: 30</h6>
       </div>
-    </div>
-    <div class="carousel-item">
-      <div class="d-block w-100 text-center p-4 bg-light border border-success rounded">
-        <h3 class="text-success">Amount Sold ☀️</h3>
-        <h5>{{ kw_sold }} kW</h5>
-        <h6>Goal: 270kW</h6>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div class="d-block w-100 text-center p-4 bg-light border border-warning rounded">
-        <h3 class="text-warning">Revenue Generated This Month 💰</h3>
-        <h5>${{ revenue_generated }}</h5>
-        <h6>Goal: $100,000</h4>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <div class="d-block w-100 text-center p-4 bg-light border border-info rounded">
-        <h3 class="text-info">Top Sales Rep 🎉</h3>
-        {% if top_sales_rep %}
-          <h5>{{ top_sales_rep.sales_representative }} - {{ top_sales_rep.total_sales }} closes</h5>
-          <h6>Congrats {{ top_sales_rep.sales_representative }}, keep it up! </h6>
-        {% else %}
-          <p>No sales this month</p>
-        {% endif %}
-      </div>
-    </div>
   </div>
+  <div class="col-md-3">
+      <div class="p-4 bg-light border border-success rounded">
+          <h3 class="text-success">Amount Sold ☀️</h3>
+          <h5>{{ kw_sold }} kW</h5>
+          <h6>Goal: 270kW</h6>
+      </div>
+  </div>
+  <div class="col-md-3">
+      <div class="p-4 bg-light border border-warning rounded">
+        <h3 class="text-warning">{{ month }} Revenue 💰</h3>
 
-
-  <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="visually-hidden bg-dark">Previous</span>
-  </button>
-  <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="visually-hidden bg-dark">Next</span>
-  </button>
+          <h5>${{ revenue_generated }}</h5>
+          <h6>Goal: $100,000</h4>
+      </div>
+  </div>
+  <div class="col-md-3">
+      <div class="p-4 bg-light border border-info rounded">
+          <h3 class="text-info">Top Sales Rep 🎉</h3>
+          {% if top_sales_rep %}
+              <h5>{{ top_sales_rep.sales_representative }} - {{ top_sales_rep.total_sales }} closes</h5>
+              <h6>Congrats {{ top_sales_rep.sales_representative }}, keep it up!</h6>
+          {% else %}
+              <p>No sales this month</p>
+          {% endif %}
+      </div>
+  </div>
 </div>
 
+
 <br/>
 <br/>
+
 
 <div class="row">
   <!-- Calendar Section -->
@@ -109,20 +100,19 @@
       <div id="calendar"></div>
   </div>
   <!-- Right Section -->
-  <!-- Start of the new section added -->
   <div class="col-md-6">
       <!-- Tasks for the Day -->
       <div class="card mb-4">
         <div class="card-body">
-          <h5 class="card-title">Tasks for Today</h5>
+          <h5 class="card-title">Tasks for Today 📌</h5>
           <ul class="list-group">
-            {% for task in tasks %}
-              {% if task.date == today %}
-                <li class="list-group-item">
-                  <strong>{{ task.title }}</strong><br/>
-                  {{ task.description }}
-                </li>
-              {% endif %}
+            {% for task in tasks_today %}
+              <li class="list-group-item">
+                <strong>{{ task.title }}</strong><br/>
+                {{ task.description }}
+              </li>
+            {% empty %}
+              <li class="list-group-item">No tasks for today</li>
             {% endfor %}
           </ul>
         </div>
@@ -130,23 +120,23 @@
       <!-- Upcoming Installation Dates -->
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">Upcoming Installation Dates</h5>
+          <h5 class="card-title">Upcoming Installation Dates ☀️</h5>
           <ul class="list-group">
-            {% for record in records %}
-              {% if record.installation_date >= today %}
-                <li class="list-group-item">
-                  <strong>{{ record.first_name }} {{ record.last_name }}</strong><br/>
-                  {{ record.installation_date|date:"M. d, Y" }}<br/>
-                  {{ record.address }}, {{ record.city }}
-                </li>
-              {% endif %}
+            {% for record in upcoming_installations %}
+              <li class="list-group-item">
+                <strong>{{ record.first_name }} {{ record.last_name }}</strong><br/>
+                {{ record.installation_date|date:"M. d, Y" }}<br/>
+                {{ record.address }}, {{ record.city }}
+              </li>
+            {% empty %}
+              <li class="list-group-item">No upcoming installations</li>
             {% endfor %}
           </ul>
         </div>
       </div>
   </div>
-  <!-- End of the new section added -->
 </div>
+
 
 
 
@@ -233,6 +223,7 @@
     }
   }
 </script>
+
 
 
 {% else %}

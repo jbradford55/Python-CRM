@@ -15,6 +15,10 @@ from django.core.mail import send_mail
 from django.contrib import messages
 from django.shortcuts import redirect, get_object_or_404
 from django.db.models import Count, Sum
+from django.http import JsonResponse
+import openai
+import os
+from datetime import datetime
 
 
 """def home(request):
@@ -52,6 +56,7 @@ def home(request):
 		records = Records.objects.all()
 
 	tasks = Task.objects.all()
+	today = timezone.localdate()
 
 	# Get the current month
 	now = timezone.now()
@@ -61,6 +66,11 @@ def home(request):
     # Filter records for the current month
 	current_month_records = Records.objects.filter(created_at__gte=current_month_start, created_at__lt=next_month)
 
+	current_month = datetime.now().strftime('%B')
+	context = {
+        'month': current_month,
+        # Include other context variables here
+    }
     # Aggregate data
 	sales_made = current_month_records.count()
 	kw_sold = current_month_records.aggregate(Sum('system_size'))['system_size__sum'] or 0
@@ -74,11 +84,23 @@ def home(request):
 	lead_sources = current_month_records.values('lead_source').annotate(count=Count('id'))
 	lead_source_data = {item['lead_source']: item['count'] for item in lead_sources}
 
+	# Filter tasks for today
+	tasks_today = tasks.filter(date=today)
+
+	# Filter upcoming installations
+	upcoming_installations = records.filter(installation_date__gte=today).order_by('installation_date')[:3]
+
 	print("Records:", list(records.values()))
+	print("\n")
 	print("Tasks:", list(tasks.values()))
+	print("\n")
 	print("Sales made this month:", sales_made)
 	print("kW sold this month:", kw_sold)
 	print("Revenue generated this month:", revenue_generated)
+
+	print("Tasks for today:", list(tasks_today.values()))
+	print("Upcoming installations:", list(upcoming_installations.values()))
+	
 
 	context = {
         'records': records,
@@ -87,6 +109,9 @@ def home(request):
         'kw_sold': kw_sold,
         'revenue_generated': revenue_generated,
 		'top_sales_rep': top_sales_rep,
+		'tasks_today': tasks_today,
+		'upcoming_installations': upcoming_installations,
+		'today': today,
     }
 
     # Check to see if logging in
@@ -203,6 +228,24 @@ def add_record(request):
 				"""
 				from_email = 'letsgonets03@gmail.com'
 				recipient_list = ['letsgonets03@gmail.com']
+				send_mail(subject, message, from_email, recipient_list)
+
+				subject = 'Congratulations on going Solar!'
+				message = f"""
+				\nYour decision helps contribute to a brighter, more sustainable future. Our project management team will reach out to you shortly about the next steps moving forward. \nHere is your information:
+
+				Details:
+				Name: {add_record.first_name} {add_record.last_name}
+				Address: {add_record.address}, {add_record.city}, {add_record.state} {add_record.zipcode}
+				Project Status: {add_record.project_status}
+				Installation Date: {add_record.installation_date}
+				System Size (kW): {add_record.system_size}
+				Estimated Cost: {add_record.estimated_cost}
+				Sales Representative: {add_record.sales_representative}
+				Incentives: {add_record.incentives}
+				"""
+				from_email = 'letsgonets03@gmail.com'
+				recipient_list = [add_record.email]
 				send_mail(subject, message, from_email, recipient_list)
 
 
@@ -343,3 +386,4 @@ def dashboard(request):
         'top_reps': top_reps,
     }
     return render(request, 'dashboard.html', context)
+
