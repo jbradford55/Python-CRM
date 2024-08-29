@@ -12,9 +12,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-a1^oy1dc15#ykgwpggo3)y-)q5^4)j!&ls*eao3w2+0m4+d8u)"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["http://127.0.0.1:8000/"]
 
 
 # Application definition
@@ -65,14 +65,18 @@ WSGI_APPLICATION = "dcrm.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",
-        "NAME": "elderco4",
-        "USER": "root",
-        "PASSWORD": "Gswarrior3",
-        "HOST": "localhost",
-        "PORT": "3306",
+        "ENGINE": "django.db.backends.postgresql_psycopg2",
+        "NAME": "mydatabase",
+        "USER": "jimmy",
+        "PASSWORD": "Gswarrior3!",
+        "HOST": "database-1.cvui4ccaimm7.us-east-1.rds.amazonaws.com",
+        "PORT": "5432",
+        'OPTIONS': {
+            'connect_timeout': 10000,  # Increase the timeout as needed
+        }
     }
 }
+
 
 
 # Password validation
@@ -110,6 +114,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field

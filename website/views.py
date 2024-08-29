@@ -227,7 +227,7 @@ def add_record(request):
 				Incentives: {add_record.incentives}
 				"""
 				from_email = 'letsgonets03@gmail.com'
-				recipient_list = ['letsgonets03@gmail.com']
+				recipient_list = ['jrbradford@ucdavis.edu']
 				send_mail(subject, message, from_email, recipient_list)
 
 				subject = 'Congratulations on going Solar!'
@@ -245,7 +245,7 @@ def add_record(request):
 				Incentives: {add_record.incentives}
 				"""
 				from_email = 'letsgonets03@gmail.com'
-				recipient_list = [add_record.email]
+				recipient_list = ['letsgonets03@gmail.com']
 				send_mail(subject, message, from_email, recipient_list)
 
 
@@ -364,7 +364,7 @@ def email_customer_info(request, pk):
             message += "Contract: No contract uploaded"
 
         from_email = 'letsgonets03@gmail.com'
-        recipient_list = ['jimmybradford55@yahoo.com']
+        recipient_list = ['jrbradford@ucdavis.edu']
 
         send_mail(subject, message, from_email, recipient_list)
         messages.success(request, "Customer information has been emailed successfully!")
